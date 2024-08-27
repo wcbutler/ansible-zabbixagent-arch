@@ -1,0 +1,29 @@
+# configure-zabbix.yml
+---
+- hosts: arch
+  tasks:
+    - name: Install Zabbix Agent
+      pacman:
+        name: zabbix-agent
+        state: present
+      become: yes
+      tags: install
+
+    - name: Configure Zabbix Agent
+      template:
+        src: zabbix_agentd.conf.j2
+        dest: /etc/zabbix/zabbix_agentd.conf
+      notify: restart zabbix-agent
+      tags: configure
+
+    - name: Start Zabbix Agent
+      service:
+        name: zabbix-agent
+        state: started
+      tags: start
+
+  handlers:
+    - name: restart zabbix-agent
+      service:
+        name: zabbix-agent
+        state: restarted
